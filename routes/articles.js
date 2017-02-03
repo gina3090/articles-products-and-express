@@ -1,59 +1,71 @@
 const express = require('express');
 const router = express.Router();
+const db = require('../db/connection');
 const articles = require('../db/articles');
 
-let articleArr = [];
-
-router.get('/', (req, res) => {
-  articleArr = articles.all();
-  res.json(articleArr);
-  // res.render('index');
+router.get('/new', (req, res) => {
+  res.render('partials/new-article');
 });
 
-router.post('/new', (req, res) => {
-  let newObj = {
-    "title": req.body.title,
-    "body": req.body.body,
-    "author": req.body.author,
-    "urlTitle": encodeURI(req.body.title)
-  };
-  articles.add(newObj);
-  if(req.body.hasOwnProperty('title') && req.body.hasOwnProperty('body') && req.body.hasOwnProperty('author') && req.body.hasOwnProperty('urlTitle')) {
-    res.redirect('/articles');
-  } else {
-    res.redirect('/new');
-  }
+router.get('/:title/edit', (req, res) => {
+  let urltitle = encodeURI(req.body.title);
+  articles.editByTitle(req.body.title, req.body.body, req.body.author, urltitle)
+    .then(article => {
+      res.render('partials/edit-article', {article: article});
+    })
+    .catch(err => console.error(err));
+});
+
+router.get('/:title/delete', (req, res) => {
+  let urltitle = encodeURI(req.body.title);
+  articles.deleteByTitle(urltitle)
+    .then(article => {
+      res.redirect('/articles');
+    })
+    .catch(err => console.error(err));
 });
 
 router.get('/:title', (req, res) => {
-  let title = req.params.title;
-  res.send(articles.getByTitle(title));
+  let urltitle = encodeURI(req.body.title);
+  articles.getByTitle(urltitle)
+    .then(article => {
+      res.render('partials/article', {article: article});
+    })
+    .catch(err => console.error(err));
 });
 
-router.put('/:title', (req, res) => {
-  let title = req.params.title;
-  let editObj = {
-    "title": req.body.title,
-    "body": req.body.body,
-    "author": req.body.author,
-    "urlTitle": encodeURI(req.body.title)
-  };
-  articles.editByTitle(title, editObj);
-  if(req.body.hasOwnProperty('title') && req.body.hasOwnProperty('body') && req.body.hasOwnProperty('author') && req.body.hasOwnProperty('urlTitle')) {
-    res.redirect('/articles');
-  } else {
-    res.redirect('/:title/edit');
-  }
+router.get('/', (req, res) => {
+  articles.all()
+    .then(articles => {
+      res.render('partials/article', {articles: articles});
+    })
+    .catch(err => console.error(err));
 });
 
-router.delete('/:title', (req, res) => {
-  let title = req.params.title;
-  articles.deleteByTitle(title);
-  if(articleArr.indexOf(title) === -1) {
-    res.redirect('/articles');
-  } else {
-    res.redirect('/:title');
-  }
+router.post('/new', (req, res) => {
+  articles.add(req.body.title, req.body.body, req.body.author)
+    .then(article => {
+      res.redirect('/articles');
+    })
+    .catch(err => console.error(err));
+});
+
+router.put('/:title/edit', (req, res) => {
+  let urltitle = encodeURI(req.body.title);
+  articles.editByTitle(req.body, urltitle)
+    .then(article => {
+      res.redirect('/articles');
+    })
+    .catch(err => console.error(err));
+});
+
+router.delete('/:title/delete', (req, res) => {
+  let urltitle = encodeURI(req.body.title);
+  articles.deleteByTitle(urltitle)
+    .then(article => {
+      res.redirect('/articles');
+    })
+    .catch(err => console.error(err));
 });
 
 module.exports = router;

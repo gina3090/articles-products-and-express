@@ -1,40 +1,28 @@
-let articleArr = [];
+const db = require('../db/connection');
 
 module.exports = (function(){
 
   function all() {
-    return articleArr;
+    return db.any("SELECT * FROM articles");
   }
 
-  function add(obj) {
-    articleArr.push(obj);
+  function add(title, body, author) {
+    return db.none(`INSERT INTO articles (title, body, author, urltitle) VALUES ('${title}', '${body}', '${author}', '${encodeURI(title)}')`);
   }
 
-  function getByTitle(title) {
-    for(let i = 0; i < articleArr.length; i++) {
-      if(articleArr[i].title === title) {
-        return articleArr[i];
-      }
-    }
+  function getByTitle(urltitle) {
+    return db.one(`SELECT * FROM products WHERE urltitle = ${urltitle}`);
   }
 
-  function editByTitle(title, obj) {
-    for(let i = 0; i < articleArr.length; i++) {
-      if(articleArr[i].title === title) {
-        articleArr[i].title = obj.title;
-        articleArr[i].body = obj.body;
-        articleArr[i].author = obj.author;
-        articleArr[i].urlTitle = encodeURI(obj.title);
-      }
-    }
+  function editByTitle(req, urltitle) {
+    return db.none(`UPDATE articles SET
+      title = '${req.title}',
+      body = '${req.body}',
+      author = '${req.author}' WHERE urltitle = '${urltitle}'`);
   }
 
-  function deleteByTitle(title) {
-    for(let i = 0; i < productArr.length; i++) {
-      if(articleArr[i].title === title) {
-        articleArr.splice(i, 1);
-      }
-    }
+  function deleteByTitle(urltitle) {
+    return db.none(`DELETE FROM products WHERE urltitle = ${urltitle}`);
   }
 
   return {

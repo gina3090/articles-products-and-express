@@ -1,39 +1,28 @@
-let productArr = [];
+const db = require('../db/connection');
 
 module.exports = (function(){
 
   function all() {
-    return productArr;
+    return db.any("SELECT * FROM products ORDER BY id ASC");
   }
 
-  function add(obj) {
-    productArr.push(obj);
+  function add(name, price, inventory) {
+    return db.none(`INSERT INTO products (name, price, inventory) VALUES ('${name}', '${price}', '${inventory}')`);
   }
 
   function getById(id) {
-    for(let i = 0; i < productArr.length; i++) {
-      if(productArr[i].id === id) {
-        return productArr[i];
-      }
-    }
+    return db.one(`SELECT * FROM products WHERE id = ${id}`);
   }
 
-  function editById(id, obj) {
-    for(let i = 0; i < productArr.length; i++) {
-      if(productArr[i].id === id) {
-        productArr[i].name = obj.name;
-        productArr[i].price = obj.price;
-        productArr[i].inventory = obj.inventory;
-      }
-    }
+  function editById(req, id) {
+    return db.none(`UPDATE products SET
+      name = '${req.name}',
+      price = '${req.price}',
+      inventory = '${req.inventory}' WHERE id = '${id}'`);
   }
 
   function deleteById(id) {
-    for(let i = 0; i < productArr.length; i++) {
-      if(productArr[i].id === id) {
-        productArr.splice(i, 1);
-      }
-    }
+    return db.none(`DELETE FROM products WHERE id = ${id}`);
   }
 
   return {
