@@ -1,0 +1,12 @@
+<form method="POST" action="/articles/{{article.title}}/edit?_method=PUT">
+  Title
+  <input type="text" name="title" value="{{article.title}}">
+  Body
+  <input type="text" name="body" value="{{article.body}}">
+  Author
+  <input type="text" name="author" value="{{article.author}}">
+{{!--   UrlTitle
+  <input type="text" name="inventory" value="{{article.urltitle}}"> --}}
+  <input type="hidden" name="_method" value="PUT">
+  <button type="submit">Submit</button>
+</form>
