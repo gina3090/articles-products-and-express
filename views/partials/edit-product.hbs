@@ -1,0 +1,10 @@
+<form method="POST" action="/products/{{product.id}}/edit?_method=PUT">
+  Name
+  <input type="text" name="name" value="{{product.name}}">
+  Price
+  <input type="text" name="price" value="{{product.price}}">
+  Inventory
+  <input type="text" name="inventory" value="{{product.inventory}}">
+  <input type="hidden" name="_method" value="PUT">
+  <button type="submit">Submit</button>
+</form>
